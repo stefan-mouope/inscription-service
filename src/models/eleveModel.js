@@ -1,35 +1,48 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/db.js";
 
-const Eleve = sequelize.define("eleve", {
-  id_eleve: {
+const Student = sequelize.define("Student", {
+  id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
     primaryKey: true,
   },
-  nom: {
+  matricule: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    unique: true,
+  },
+  last_name: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  prenom: {
+  first_name: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  adresse: {
+  birth_date: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
+  adress: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  num_parent: {
+  sex: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  id_etablissement: {
+  phone_parent: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  school_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
 }, {
-  tableName: "eleve",
+  tableName: "Student",
   timestamps: false,
 });
 
-export default Eleve;
+export default Student;

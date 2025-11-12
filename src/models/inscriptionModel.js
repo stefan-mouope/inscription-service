@@ -1,26 +1,26 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/db.js";
 
-const Inscription = sequelize.define("inscription", {
-  id_inscription: {
+const Inscription = sequelize.define("Incription", {
+  id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
     primaryKey: true,
   },
-  id_annee: {
+  student_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  id_eleve: {
+  academieYear_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  id_classe: {
+  classRoom_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
 }, {
-  tableName: "inscription",
+  tableName: "Incription",
   timestamps: false,
 });
 

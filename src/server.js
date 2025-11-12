@@ -3,7 +3,7 @@ dotenv.config();
 
 import app from "./app.js";              // <-- import correct de l'app Express
 import sequelize from "./config/db.js";
-import { Eleve, Inscription, Tranche, Payement } from "./models/associations.js";
+import { Student, Inscription, Tranche, Payer } from "./models/associations.js";
 import eurekaClient from "./eureka/eurekaClient.js";
 import { connectRabbitMQ } from "./config/rabbitmq.js";
 
@@ -11,10 +11,10 @@ const PORT = process.env.PORT || 5000;
 
 (async () => {
   try {
-    await Eleve.sync({ alter: true });
+    await Student.sync({ alter: true });
     await Tranche.sync({ alter: true });
     await Inscription.sync({ alter: true });
-    await Payement.sync({ alter: true });
+    await Payer.sync({ alter: true });
 
     console.log("🗄️  Modèles synchronisés avec la base de données.");
 

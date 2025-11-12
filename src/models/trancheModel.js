@@ -1,26 +1,26 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/db.js";
 
-const Tranche = sequelize.define("tranche", {
-  id_tranche: {
+const Tranche = sequelize.define("Tranche", {
+  id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
     primaryKey: true,
   },
-  nom_tranche: {
+  tranche_name: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  montant: {                // <-- Ajout du champ montant
+  amount: {
     type: DataTypes.FLOAT,
     allowNull: false,
   },
-  id_etablissement: {
+  school_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
 }, {
-  tableName: "tranche",
+  tableName: "Tranche",
   timestamps: false,
 });
 

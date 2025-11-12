@@ -1,23 +1,23 @@
 import express from "express";
 import {
-  createEleve,
-  getAllEleves,
-  getEleveById,
-  deleteEleve,
+  createStudent,
+  getAllStudents,
+  getStudentById,
+  deleteStudent,
 } from "../controllers/eleveController.js";
 
 const router = express.Router();
 
-// ➕ Créer un élève
-router.post("/", createEleve);
+// ➕ Créer un étudiant
+router.post("/", createStudent);
 
-// 📄 Lister tous les élèves
-router.get("/", getAllEleves);
+// 📄 Lister tous les étudiants
+router.get("/", getAllStudents);
 
-// 🔍 Obtenir un élève par ID
-router.get("/:id", getEleveById);
+// 🔍 Obtenir un étudiant par ID
+router.get("/:id", getStudentById);
 
-// 🗑️ Supprimer un élève
-router.delete("/:id", deleteEleve);
+// 🗑️ Supprimer un étudiant
+router.delete("/:id", deleteStudent);
 
 export default router;

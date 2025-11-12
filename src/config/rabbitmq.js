@@ -13,7 +13,7 @@ export const connectRabbitMQ = async () => {
   channel = await connection.createChannel();
 
   // Déclare un exchange
-  await channel.assertExchange("classe_events", "topic", { durable: false });
+  await channel.assertExchange("inscription_events", "topic", { durable: false });
 
   // Déclare une queue de réponse exclusive
   replyQueue = await channel.assertQueue("", { exclusive: true });
@@ -42,7 +42,7 @@ export const connectRabbitMQ = async () => {
 /**
  * Publie un événement et attend la réponse du consommateur
  */
-export const publishEvent = async (event) => {
+export const publishEvent = async (event,routingKey='inscription.request') => {
   if (!channel) throw new Error("❌ Channel RabbitMQ non initialisé");
 
   const correlationId = uuidv4();
@@ -51,8 +51,8 @@ export const publishEvent = async (event) => {
     pendingResponses.set(correlationId, { resolve, reject });
 
     channel.publish(
-      "classe_events",
-      "",
+      "inscription_events",
+      routingKey,
       Buffer.from(JSON.stringify(event)),
       { replyTo: replyQueue.queue, correlationId, persistent: true }
     );

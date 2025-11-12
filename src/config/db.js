@@ -1,24 +1,27 @@
 import { Sequelize } from "sequelize";
-import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
-dotenv.config();
+// Obtenir __dirname en ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
-const sequelize = new Sequelize(
-  process.env.DB_NAME,
-  process.env.DB_USER,
-  process.env.DB_PASSWORD,
-  {
-    host: process.env.DB_HOST,
-    dialect: "mysql",
-    logging: false, // désactive les logs SQL
+// Crée une instance Sequelize pour SQLite
+const sequelize = new Sequelize({
+  dialect: "sqlite",
+  storage: path.join(__dirname, "../../database.sqlite"), // le fichier local
+  logging: false, // désactive les logs SQL
+});
+
+// Test de connexion (fonction async pour pouvoir utiliser await)
+(async () => {
+  try {
+    await sequelize.authenticate();
+    console.log("✅ Connexion à la base SQLite réussie via Sequelize");
+  } catch (error) {
+    console.error("❌ Impossible de se connecter à la base SQLite :", error);
   }
-);
-
-try {
-  await sequelize.authenticate();
-  console.log("✅ Connexion à la base MySQL réussie via Sequelize");
-} catch (error) {
-  console.error("❌ Impossible de se connecter à la base :", error);
-}
+})();
 
 export default sequelize;
