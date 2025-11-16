@@ -1,4 +1,6 @@
+// routes/inscriptionRoutes.js (MODIFIÉ)
 import express from "express";
+import { requireAuth } from "../middleware/auth.js";
 import {
   createInscription,
   getAllInscriptions,
@@ -8,7 +10,9 @@ import {
 
 const router = express.Router();
 
-router.post("/", createInscription);
+// SEULEMENT LE DIRECTEUR PEUT CRÉER
+router.post("/", requireAuth('create_inscription'), createInscription);
+
 router.get("/", getAllInscriptions);
 router.get("/:id", getInscriptionById);
 router.delete("/:id", deleteInscription);

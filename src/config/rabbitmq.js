@@ -1,6 +1,4 @@
-
-
-// 🔗 Connexion à RabbitMQ et configuration du consommateur
+// src/config/rabbitmq.js
 import amqp from "amqplib";
 import { v4 as uuidv4 } from "uuid";
 
@@ -9,41 +7,39 @@ let replyQueue;
 const pendingResponses = new Map();
 
 export const connectRabbitMQ = async () => {
-  const connection = await amqp.connect("amqp://localhost");
-  channel = await connection.createChannel();
+  try {
+    const connection = await amqp.connect("amqp://guest:guest@localhost:5672");
+    channel = await connection.createChannel();
 
-  // Déclare un exchange
-  await channel.assertExchange("classe_events", "topic", { durable: false });
+    await channel.assertQueue("auth_verify_queue", { durable: true });
+    const { queue } = await channel.assertQueue("", { exclusive: true });
+    replyQueue = queue;
 
-  // Déclare une queue de réponse exclusive
-  replyQueue = await channel.assertQueue("", { exclusive: true });
+    console.log("Connecté à RabbitMQ | Reply Queue:", replyQueue);
 
-  console.log("✅ Connecté à RabbitMQ, queue de réponse :", replyQueue.queue);
-
-  // Écoute les réponses
-  channel.consume(
-    replyQueue.queue,
-    (msg) => {
-      if (!msg.properties.correlationId) return;
-
-      const correlationId = msg.properties.correlationId;
-      const pending = pendingResponses.get(correlationId);
-
-      if (pending) {
-        const response = JSON.parse(msg.content.toString());
-        pending.resolve(response); // Répond à la promesse en attente
-        pendingResponses.delete(correlationId);
-      }
-    },
-    { noAck: true }
-  );
+    channel.consume(
+      replyQueue,
+      (msg) => {
+        if (!msg?.properties?.correlationId) return;
+        const correlationId = msg.properties.correlationId;
+        const pending = pendingResponses.get(correlationId);
+        if (pending) {
+          const response = JSON.parse(msg.content.toString());
+          pending.resolve(response);
+          pendingResponses.delete(correlationId);
+        }
+      },
+      { noAck: true }
+    );
+  } catch (err) {
+    console.error("Erreur connexion RabbitMQ:", err);
+    throw err;
+  }
 };
 
-/**
- * Publie un événement et attend la réponse du consommateur
- */
-export const publishEvent = async (event) => {
-  if (!channel) throw new Error("❌ Channel RabbitMQ non initialisé");
+// CORRIGÉ : on passe token + action
+export const publishEvent = async (token, action) => {
+  if (!channel) throw new Error("Channel RabbitMQ non initialisé");
 
   const correlationId = uuidv4();
 
@@ -51,16 +47,18 @@ export const publishEvent = async (event) => {
     pendingResponses.set(correlationId, { resolve, reject });
 
     channel.publish(
-      "classe_events",
-      "",
-      Buffer.from(JSON.stringify(event)),
-      { replyTo: replyQueue.queue, correlationId, persistent: true }
+      "", // exchange vide
+      "auth_verify_queue", // queue directe
+      Buffer.from(JSON.stringify({ token, action })), // ENVOIE token + action
+      {
+        replyTo: replyQueue,
+        correlationId,
+        persistent: true,
+      }
     );
 
-    console.log("📤 Événement publié :", event, "correlationId:", correlationId);
+    console.log("Événement publié: VERIFY_TOKEN ID:", correlationId);
   });
 
-  // Retourne la réponse quand elle arrive
   return promise;
 };
-

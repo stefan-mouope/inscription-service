@@ -6,8 +6,13 @@ import {
   deleteEleve,
 } from "../controllers/eleveController.js";
 
+import { requireAuth } from "../middleware/auth.js";
+
+
 const router = express.Router();
 
+
+router.post("/", requireAuth('create_eleve'), createEleve);
 // ➕ Créer un élève
 router.post("/", createEleve);
 

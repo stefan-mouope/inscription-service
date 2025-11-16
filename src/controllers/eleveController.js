@@ -1,6 +1,8 @@
 import { Eleve } from "../models/associations.js";
 
 // ➕ Créer un élève
+// controllers/eleveController.js
+
 export const createEleve = async (req, res) => {
   try {
     const { nom, prenom, adresse, num_parent, id_etablissement } = req.body;
@@ -16,11 +18,28 @@ export const createEleve = async (req, res) => {
       num_parent,
       id_etablissement,
     });
-    
-    res.status(201).json({ message: "Élève créé avec succès", eleve });
+
+    // LOG SÉCURISÉ
+    console.log(`Élève créé par ${req.user.username} (${req.user.role}) | ID: ${eleve.id_eleve}`);
+
+    res.status(201).json({
+      message: "Élève créé avec succès",
+      eleve: {
+        id_eleve: eleve.id_eleve,
+        nom: eleve.nom,
+        prenom: eleve.prenom,
+        adresse: eleve.adresse,
+        num_parent: eleve.num_parent,
+        id_etablissement: eleve.id_etablissement
+      },
+      créé_par: {
+        username: req.user.username,
+        role: req.user.role
+      }
+    });
   } catch (error) {
     console.error("Erreur création élève :", error);
-    res.status(500).json({ message: "Erreur serveur", error });
+    res.status(500).json({ message: "Erreur serveur" });
   }
 };
 
