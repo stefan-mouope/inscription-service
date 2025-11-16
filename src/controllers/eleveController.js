@@ -1,23 +1,32 @@
-import { Eleve } from "../models/associations.js";
+import { Student } from "../models/associations.js";
 
+<<<<<<< HEAD
 // ➕ Créer un élève
 // controllers/eleveController.js
 
 export const createEleve = async (req, res) => {
+=======
+// ➕ Créer un étudiant
+export const createStudent = async (req, res) => {
+>>>>>>> origin/yves
   try {
-    const { nom, prenom, adresse, num_parent, id_etablissement } = req.body;
+    const { matricule, last_name, first_name, birth_date, adress, sex, phone_parent, school_id } = req.body;
 
-    if (!nom || !prenom || !id_etablissement) {
+    if (!last_name || !first_name || !school_id) {
       return res.status(400).json({ message: "Champs requis manquants" });
     }
 
-    const eleve = await Eleve.create({
-      nom,
-      prenom,
-      adresse,
-      num_parent,
-      id_etablissement,
+    const student = await Student.create({
+      matricule,
+      last_name,
+      first_name,
+      birth_date,
+      adress,
+      sex,
+      phone_parent,
+      school_id,
     });
+<<<<<<< HEAD
 
     // LOG SÉCURISÉ
     console.log(`Élève créé par ${req.user.username} (${req.user.role}) | ID: ${eleve.id_eleve}`);
@@ -40,42 +49,49 @@ export const createEleve = async (req, res) => {
   } catch (error) {
     console.error("Erreur création élève :", error);
     res.status(500).json({ message: "Erreur serveur" });
+=======
+    
+    res.status(201).json({ message: "Étudiant créé avec succès", student });
+  } catch (error) {
+    console.error("Erreur création étudiant :", error);
+    res.status(500).json({ message: "Erreur serveur", error });
+>>>>>>> origin/yves
   }
 };
 
-// 📄 Lister tous les élèves
-export const getAllEleves = async (req, res) => {
+// 📄 Lister tous les étudiants
+export const getAllStudents = async (req, res) => {
   try {
-    const eleves = await Eleve.findAll();
-    res.json(eleves);
+    const students = await Student.findAll();
+    res.json(students);
   } catch (error) {
-    console.error("Erreur récupération élèves :", error);
+    console.error("Erreur récupération étudiants :", error);
     res.status(500).json({ message: "Erreur serveur", error });
   }
 };
 
-// 🔍 Obtenir un élève par ID
-export const getEleveById = async (req, res) => {
+// 🔍 Obtenir un étudiant par ID
+export const getStudentById = async (req, res) => {
   try {
     const { id } = req.params;
-    const eleve = await Eleve.findByPk(id);
-    if (!eleve) return res.status(404).json({ message: "Élève non trouvé" });
+    const student = await Student.findByPk(id);
+    if (!student) return res.status(404).json({ message: "Étudiant non trouvé" });
 
-    res.json(eleve);
+    res.json(student);
   } catch (error) {
     res.status(500).json({ message: "Erreur serveur", error });
   }
 };
 
-// 🗑️ Supprimer un élève
-export const deleteEleve = async (req, res) => {
+// 🗑️ Supprimer un étudiant
+export const deleteStudent = async (req, res) => {
   try {
     const { id } = req.params;
-    const eleve = await Eleve.findByPk(id);
-    if (!eleve) return res.status(404).json({ message: "Élève non trouvé" });
+    const student = await Student.findByPk(id);
+    if (!student) return res.status(404).json({ message: "Étudiant non trouvé" });
 
-    await eleve.destroy();
-    res.json({ message: "Élève supprimé avec succès" });
+    await student.destroy();
+    res.json({ message: "Étudiant supprimé avec succès" });
   } catch (error) {
     res.status(500).json({ message: "Erreur serveur", error });
   }

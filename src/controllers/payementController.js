@@ -1,25 +1,25 @@
-import { Payement, Inscription, Tranche } from "../models/associations.js";
+import { Payer, Inscription, Tranche } from "../models/associations.js";
 
 // ➕ Enregistrer un paiement
-export const createPayement = async (req, res) => {
+export const createPayer = async (req, res) => {
   try {
-    const { id_inscription, id_tranche } = req.body;
+    const { inscription_id, tranche_id } = req.body;
 
-    if (!id_inscription || !id_tranche) {
+    if (!inscription_id || !tranche_id) {
       return res.status(400).json({ message: "Champs requis manquants" });
     }
 
     // Vérifie si les clés étrangères existent
-    const inscription = await Inscription.findByPk(id_inscription);
-    const tranche = await Tranche.findByPk(id_tranche);
+    const inscription = await Inscription.findByPk(inscription_id);
+    const tranche = await Tranche.findByPk(tranche_id);
 
     if (!inscription || !tranche) {
       return res.status(404).json({ message: "Inscription ou tranche introuvable" });
     }
 
     // Vérifie si le paiement existe déjà pour cette tranche
-    const existant = await Payement.findOne({
-      where: { id_inscription, id_tranche },
+    const existant = await Payer.findOne({
+      where: { inscription_id, tranche_id },
     });
 
     if (existant) {
@@ -27,17 +27,17 @@ export const createPayement = async (req, res) => {
     }
 
     // Création du paiement sans montant, car il est fixe pour la tranche
-    const payement = await Payement.create({ id_inscription, id_tranche });
+    const payer = await Payer.create({ inscription_id, tranche_id });
 
     // Retourne le paiement avec le montant de la tranche inclus
-    const payementAvecMontant = await Payement.findByPk(payement.id_payement, {
+    const payerAvecMontant = await Payer.findByPk(payer.id, {
       include: [
-        { model: Inscription, attributes: ["id_inscription", "id_eleve", "id_classe"] },
-        { model: Tranche, attributes: ["nom_tranche", "montant"] }, // Montant ici vient de la tranche
+        { model: Inscription, attributes: ["id", "student_id", "classRoom_id"] },
+        { model: Tranche, attributes: ["tranche_name", "amount"] }, // Montant ici vient de la tranche
       ],
     });
 
-    res.status(201).json({ message: "Paiement enregistré avec succès", payement: payementAvecMontant });
+    res.status(201).json({ message: "Paiement enregistré avec succès", payer: payerAvecMontant });
   } catch (error) {
     console.error("Erreur création paiement :", error);
     res.status(500).json({ message: "Erreur serveur", error });
@@ -45,15 +45,15 @@ export const createPayement = async (req, res) => {
 };
 
 // 📄 Lister tous les paiements avec montant de la tranche
-export const getAllPayements = async (req, res) => {
+export const getAllPayers = async (req, res) => {
   try {
-    const payements = await Payement.findAll({
+    const payers = await Payer.findAll({
       include: [
-        { model: Inscription, attributes: ["id_inscription", "id_eleve", "id_classe"] },
-        { model: Tranche, attributes: ["nom_tranche", "montant"] },
+        { model: Inscription, attributes: ["id", "student_id", "classRoom_id"] },
+        { model: Tranche, attributes: ["tranche_name", "amount"] },
       ],
     });
-    res.json(payements);
+    res.json(payers);
   } catch (error) {
     console.error("Erreur récupération paiements :", error);
     res.status(500).json({ message: "Erreur serveur", error });
@@ -61,19 +61,19 @@ export const getAllPayements = async (req, res) => {
 };
 
 // 🔍 Obtenir un paiement par ID avec montant de la tranche
-export const getPayementById = async (req, res) => {
+export const getPayerById = async (req, res) => {
   try {
     const { id } = req.params;
-    const payement = await Payement.findByPk(id, {
+    const payer = await Payer.findByPk(id, {
       include: [
-        { model: Inscription, attributes: ["id_inscription", "id_eleve", "id_classe"] },
-        { model: Tranche, attributes: ["nom_tranche", "montant"] },
+        { model: Inscription, attributes: ["id", "student_id", "classRoom_id"] },
+        { model: Tranche, attributes: ["tranche_name", "amount"] },
       ],
     });
 
-    if (!payement) return res.status(404).json({ message: "Paiement non trouvé" });
+    if (!payer) return res.status(404).json({ message: "Paiement non trouvé" });
 
-    res.json(payement);
+    res.json(payer);
   } catch (error) {
     res.status(500).json({ message: "Erreur serveur", error });
   }

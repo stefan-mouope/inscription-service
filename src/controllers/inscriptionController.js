@@ -1,21 +1,21 @@
 import { publishEvent } from "../config/rabbitmq.js";
-import { Eleve, Inscription, Tranche, Payement } from "../models/associations.js";
+import { Student, Inscription, Tranche, Payer } from "../models/associations.js";
 
 // ➕ Créer une nouvelle inscription
 export const createInscription = async (req, res) => {
   try {
-    const { eleve, id_annee, id_classe } = req.body;
+    const { student, academieYear_id, classRoom_id } = req.body;
 
     // ✅ Vérification des champs requis
-    if (!eleve || !id_annee || !id_classe) {
+    if (!student || !academieYear_id || !classRoom_id) {
       return res.status(400).json({ message: "Champs requis manquants" });
     }
 
     // 📢 Publication de l'événement pour vérifier la classe et l'année académique
     const event_data = {
-      id_classe,
-      id_annee,
-      id_etablissement: eleve.id_etablissement, // ou autre champ selon ton modèle
+      classRoom_id,
+      academieYear_id,
+      school_id: student.school_id,
     };
 
     // Publier l'événement sur RabbitMQ
@@ -27,23 +27,23 @@ export const createInscription = async (req, res) => {
     console.log("📩 Réponse du service :", response);
 
     // ✅ Vérification de la validité de la réponse
-    if (!response || response.status !== "ok") {
-      return res.status(400).json({ message: "Classe ou année invalide" });
+    if (!response || response.status !== true) {
+      return res.status(400).json({ message: "verifier que la classe et l'année académique sont valides" });
     }
 
-    // ✅ Création de l'élève s’il n’existe pas déjà
-    // let nouveauEleve = await Eleve.findOne({ where: { matricule: eleve.matricule } });
+    // ✅ Création de l'étudiant s'il n'existe pas déjà
+    let nouveauStudent = await Student.findOne({ where: { matricule: student.matricule } });
 
-    if (!nouveauEleve) {
-      nouveauEleve = await Eleve.create(eleve);
-      console.log("👤 Nouvel élève créé :", nouveauEleve.id);
+    if (!nouveauStudent) {
+      nouveauStudent = await Student.create(student);
+      console.log("👤 Nouvel étudiant créé :", nouveauStudent.id);
     }
 
-    // ✅ Création de l’inscription
+    // ✅ Création de l'inscription
     const inscription = await Inscription.create({
-      id_eleve: nouveauEleve.id,
-      id_annee,
-      id_classe,
+      student_id: nouveauStudent.id,
+      academieYear_id,
+      classRoom_id,
     });
 
     res.status(201).json({
@@ -63,13 +63,13 @@ export const getAllInscriptions = async (req, res) => {
     const inscriptions = await Inscription.findAll({
       include: [
         {
-          model: Eleve,
-          attributes: ["id_eleve", "nom", "prenom", "adresse", "num_parent"],
+          model: Student,
+          attributes: ["id", "matricule", "last_name", "first_name", "adress", "phone_parent"],
         },
         {
           model: Tranche,
           as: "tranches_payees",
-          attributes: ["id_tranche", "nom_tranche", "montant"],
+          attributes: ["id", "tranche_name", "amount"],
           through: { attributes: [] }, // ne renvoie pas la table pivot
         },
       ],
@@ -89,7 +89,7 @@ export const getInscriptionById = async (req, res) => {
 
     const inscription = await Inscription.findByPk(id, {
       include: [
-        { model: Eleve },
+        { model: Student },
         { model: Tranche, as: "tranches_payees" },
       ],
     });

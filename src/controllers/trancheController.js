@@ -3,16 +3,16 @@ import { Tranche } from "../models/associations.js";
 // ➕ Créer une tranche
 export const createTranche = async (req, res) => {
   try {
-    const { nom_tranche, montant, id_etablissement } = req.body;
+    const { tranche_name, amount, school_id } = req.body;
 
-    if (!nom_tranche || !montant || !id_etablissement) {
+    if (!tranche_name || !amount || !school_id) {
       return res.status(400).json({ message: "Champs requis manquants" });
     }
 
     const tranche = await Tranche.create({
-      nom_tranche,
-      montant,
-      id_etablissement,
+      tranche_name,
+      amount,
+      school_id,
     });
 
     res.status(201).json({ message: "Tranche créée avec succès", tranche });

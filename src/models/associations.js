@@ -1,38 +1,38 @@
-import Eleve from "./eleveModel.js";
+import Student from "./eleveModel.js";
 import Inscription from "./inscriptionModel.js";
 import Tranche from "./trancheModel.js";
-import Payement from "./payementModel.js";
+import Payer from "./payementModel.js";
 
 
 
-// 🧑‍🎓 Un élève a plusieurs inscriptions
-Eleve.hasMany(Inscription, { foreignKey: "id_eleve" });
-Inscription.belongsTo(Eleve, { foreignKey: "id_eleve" });
+// 🧑‍🎓 Un étudiant a plusieurs inscriptions
+Student.hasMany(Inscription, { foreignKey: "student_id" });
+Inscription.belongsTo(Student, { foreignKey: "student_id" });
 
 
 
 Inscription.belongsToMany(Tranche, {
-  through: Payement,
-  foreignKey: "id_inscription",
-  otherKey: "id_tranche",
+  through: Payer,
+  foreignKey: "inscription_id",
+  otherKey: "tranche_id",
   as: "tranches_payees",
 });
 
 
 
 Tranche.belongsToMany(Inscription, {
-  through: Payement,
-  foreignKey: "id_tranche",
-  otherKey: "id_inscription",
+  through: Payer,
+  foreignKey: "tranche_id",
+  otherKey: "inscription_id",
   as: "inscriptions_associees",
 });
 
 
 
-Payement.belongsTo(Inscription, { foreignKey: "id_inscription" });
-Payement.belongsTo(Tranche, { foreignKey: "id_tranche" });
+Payer.belongsTo(Inscription, { foreignKey: "inscription_id" });
+Payer.belongsTo(Tranche, { foreignKey: "tranche_id" });
 
 
 
 // ✅ Exporter tous les modèles
-export { Eleve, Inscription, Tranche, Payement };
+export { Student, Inscription, Tranche, Payer };

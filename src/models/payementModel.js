@@ -1,27 +1,28 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/db.js";
 
-const Payement = sequelize.define("payement", {
-  id_payement: {
+const Payer = sequelize.define("Payer", {
+  id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
     primaryKey: true,
   },
-  id_tranche: {
+  tranche_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  id_inscription: {
+  inscription_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
   date_payement: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,
+    allowNull: true,
   },
 }, {
-  tableName: "payement",
+  tableName: "Payer",
   timestamps: false,
 });
 
-export default Payement;
+export default Payer;

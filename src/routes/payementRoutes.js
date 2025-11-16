@@ -1,19 +1,19 @@
 import express from "express";
 import {
-  createPayement,
-  getAllPayements,
-  getPayementById,
+  createPayer,
+  getAllPayers,
+  getPayerById,
 } from "../controllers/payementController.js";
 
 const router = express.Router();
 
 // ➕ Créer un paiement
-router.post("/", createPayement);
+router.post("/", createPayer);
 
 // 📄 Lister tous les paiements
-router.get("/", getAllPayements);
+router.get("/", getAllPayers);
 
 // 🔍 Obtenir un paiement par ID
-router.get("/:id", getPayementById);
+router.get("/:id", getPayerById);
 
 export default router;
