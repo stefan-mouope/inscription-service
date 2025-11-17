@@ -11,16 +11,7 @@ import { requireAuth } from "../middleware/auth.js";
 
 const router = express.Router();
 
-<<<<<<< HEAD
-
-router.post("/", requireAuth('create_eleve'), createEleve);
-// ➕ Créer un élève
-router.post("/", createEleve);
-=======
-// ➕ Créer un étudiant
-router.post("/", createStudent);
->>>>>>> origin/yves
-
+router.post("/", requireAuth("create_eleve"), createStudent);
 // 📄 Lister tous les étudiants
 router.get("/", getAllStudents);
 

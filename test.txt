@@ -6,3 +6,8 @@
 
 
 http://localhost:8000/api/auth/login/
+
+
+commnde pour lancer rabbitmq :    sudo systemctl restart rabbitmq-server
+
+
